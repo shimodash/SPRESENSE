@@ -1,3 +1,11 @@
+#include <Arduino.h>
+#include <SDHCI.h>
+#include <File.h>
+
+SDClass SD;  /**< SDClass object */ 
+
+File myFile; /**< File object */ 
+
 #include "LGFX_SPRESENSE_sample.hpp"
 
 extern const uint8_t rgb888[];
@@ -25,29 +33,78 @@ void setup(void)
   pinMode(2, INPUT_PULLUP);
   pinMode(3, INPUT_PULLUP);
   pinMode(4, INPUT_PULLUP);
-  
+
+//SD card init
+ Serial.begin(115200);
+  while (!Serial) {
+    ; /* wait for serial port to connect. Needed for native USB port only */
+  }
+
+  /* Initialize SD */
+  Serial.print("Insert SD card.");
+  while (!SD.begin()) {
+    ; /* wait until SD card is mounted. */
+  }
+
+  // /* Create a new directory */
+  // // SD.mkdir("dir/");
+
+  // /* Open the file. Note that only one file can be open at a time,
+  //    so you have to close this one before opening another. */
+  // // myFile = SD.open("dir/test.txt", FILE_WRITE);
+
+  // /* If the file opened okay, write to it */
+  // if (myFile) {
+  //   Serial.print("Writing to test.txt...");
+  //   myFile.println("testing 1, 2, 3.");
+  //   /* Close the file */
+  //   myFile.close();
+  //   Serial.println("done.");
+  // } else {
+  //   /* If the file didn't open, print an error */
+  //   Serial.println("error opening test.txt");
+  // }
+
+  // /* Re-open the file for reading */
+  // myFile = SD.open("dir/test.txt");
+
+  // if (myFile) {
+  //   Serial.println("test.txt:");
+
+  //   /* Read from the file until there's nothing else in it */
+  //   while (myFile.available()) {
+  //     Serial.write(myFile.read());
+  //   }
+  //   /* Close the file */
+  //   myFile.close();
+  // } else {
+  //   /* If the file didn't open, print an error */
+  //   Serial.println("error opening test.txt");
+  // }
+
+
 }
 
 void loop(void)
 {
 
-    digitalWrite(LED0, digitalRead(2));
-    delay(100);
-    digitalWrite(LED1, HIGH);
-    delay(100);
-    digitalWrite(LED2, HIGH);
-    delay(100);
-    digitalWrite(LED3, HIGH);
-    delay(1000);
+    // digitalWrite(LED0, digitalRead(2));
+    // delay(100);
+    // digitalWrite(LED1, HIGH);
+    // delay(100);
+    // digitalWrite(LED2, HIGH);
+    // delay(100);
+    // digitalWrite(LED3, HIGH);
+    // delay(1000);
 
-    digitalWrite(LED0, digitalRead(2));
-    delay(100);
-    digitalWrite(LED1, LOW);
-    delay(100);
-    digitalWrite(LED2, LOW);
-    delay(100);
-    digitalWrite(LED3, LOW);
-    delay(1000);
+    // digitalWrite(LED0, digitalRead(2));
+    // delay(100);
+    // digitalWrite(LED1, LOW);
+    // delay(100);
+    // digitalWrite(LED2, LOW);
+    // delay(100);
+    // digitalWrite(LED3, LOW);
+    // delay(1000);
 
 /*
   画像データを描画する関数は幾つか種類があります。
@@ -156,295 +213,51 @@ setAddrWindow は描画範囲外が指定された場合は範囲内に調整さ
 
   // 描画先の座標と画像の幅・高さを指定して画像データを描画します。
 //  lcd.pushImage(   0, 0, image_width, image_height, (uint16_t*)rgb565); // RGB565の16bit画像データを描画。
-  lcd.pushImage(   0, 0, 240, 240, (uint16_t*)sunrise); // RGB565の16bit画像データを描画。
+  // lcd.pushImage(   0, 0, 240, 240, (uint16_t*)sunrise); // RGB565の16bit画像データを描画。
+  lcd.drawPngFile(SD, "spresense_logo.png", 0, 0);
+  delay(1000);
+// 入力端子の実装がなければ以下のループを実施
+  while(true){
+    lcd.drawPngFile(SD, "snake_240x240.png", 0, 0);
+    delay(1000);
+    lcd.drawPngFile(SD, "kansya_240.png", 0, 0);
+    delay(1000);
+    lcd.drawPngFile(SD, "2025.png", 0, 0);
+    delay(1000);
+    lcd.drawPngFile(SD, "spresense_logo.png", 0, 0);
+    delay(1000);
+    if(digitalRead(2)== 0){ // Spresenseのロゴの表示後にpin2が押されていたらループを抜ける
+      break;
+    delay(1000);
+    }
+  }
 
   while(true){
-//  lcd.pushImage(   0, 0, 240, 240, (uint16_t*)oedc); // RGB565の16bit画像データを描画。
-//  delay(1000);
 //  lcd.pushImage(   0, 0, 240, 240, (uint16_t*)kansya); // RGB565の16bit画像データを描画。
 //  delay(1000);
 
   
-    digitalWrite(LED0, digitalRead(2));
-    delay(100);
-    digitalWrite(LED1, digitalRead(3));
-    delay(100);
-    digitalWrite(LED2, digitalRead(4));
-  if(digitalRead(2)== 0){
-    lcd.pushImage(   0, 0, 240, 240, (uint16_t*)myms); // RGB565の16bit画像データを描画。
-  }
+      digitalWrite(LED0, digitalRead(2));
+      delay(100);
+      digitalWrite(LED1, digitalRead(3));
+      delay(100);
+      digitalWrite(LED2, digitalRead(4));
+    if(digitalRead(2)== 0){
+      // lcd.pushImage(   0, 0, 240, 240, (uint16_t*)myms); // RGB565の16bit画像データを描画。
+    lcd.drawPngFile(SD, "snake_240x240.png", 0, 0);
+    }
 
-  if(digitalRead(3)== 0){
-    lcd.pushImage(   0, 0, 240, 240, (uint16_t*)snake); // RGB565の16bit画像データを描画。
-  }
+    if(digitalRead(3)== 0){
+      // lcd.pushImage(   0, 0, 240, 240, (uint16_t*)snake); // RGB565の16bit画像データを描画。
+    lcd.drawPngFile(SD, "kansya_240.png", 0, 0);
+    }
 
-  if(digitalRead(4)== 0){
-    lcd.pushImage(   0, 0, 240, 240, (uint16_t*)y2025); // RGB565の16bit画像データを描画。
-  }
+    if(digitalRead(4)== 0){
+      // lcd.pushImage(   0, 0, 240, 240, (uint16_t*)y2025); // RGB565の16bit画像データを描画。
+    lcd.drawPngFile(SD, "2025.png", 0, 0);
 
-  if(digitalRead(2)== 0 && digitalRead(3)== 0){
-    lcd.pushImage(   0, 0, 240, 240, (uint16_t*)sunrise); // RGB565の16bit画像データを描画。
-  }
-
-//    delay(100);
-//    digitalWrite(LED3, HIGH);
-//    delay(1000);
-//
-//    digitalWrite(LED0, digitalRead(2));
-//    delay(100);
-//    digitalWrite(LED1, LOW);
-//    delay(100);
-//    digitalWrite(LED2, LOW);
-//    delay(100);
-//    digitalWrite(LED3, LOW);
-//    delay(1000);
-  
-  
-  }
-  
-  // データとバイト順変換の指定が一致していない場合、色化けします。
-  lcd.pushImage(   0, 40, image_width, image_height, (uint16_t*)swap565); // NG. バイト順変換済みデータにバイト順変換を行うと色化けする。
-
-  // 描画範囲が画面外にはみ出すなどした場合でも、描画結果が崩れることはありません。
-  lcd.pushImage(-1, 80, image_width, image_height, (uint16_t*)rgb565); // X座標-1（画面外）を指定しても描画は乱れない。
-
-  // データと型が一致していない場合は、描画結果が崩れます。
-  lcd.pushImage(0, 120, image_width, image_height, (uint8_t*)rgb565); // RGB565のデータをuint8_tにキャストし、RGB332として扱わせると描画が乱れる。
-
-  // データと型が一致していれば、適切に形式変換が行われます。
-  lcd.pushImage(0, 160, image_width, image_height, (uint8_t*)rgb332); // RGB332のデータでも正しく描画できる。
-
-
-  lcd.setSwapBytes(false);   // バイト順の変換を無効にする。
-  lcd.pushImage( 40,   0, image_width, image_height, (uint8_t* )rgb332);  // good. RGB332のデータはバイト順変換の影響を受けない。
-  lcd.pushImage( 40,  40, image_width, image_height, (uint16_t*)rgb565);  // NG. RGB565のデータはバイト順変換が必要。
-  lcd.pushImage( 40,  80, image_width, image_height, (void*    )rgb888);  // NG. RGB888のデータはバイト順変換が必要。
-  lcd.pushImage( 40, 120, image_width, image_height, (uint16_t*)swap565); // good. バイト順変換済みRGB565のデータは色化けしない。
-  lcd.pushImage( 40, 160, image_width, image_height, (void*    )bgr888);  // good. バイト順変換済みRGB888のデータは色化けしない。
-
-  lcd.setSwapBytes(true);   // バイト順の変換を有効にする。
-  lcd.pushImage( 80,   0, image_width, image_height, (uint8_t* )rgb332);  // good. RGB332のデータはバイト順変換の影響を受けない。
-  lcd.pushImage( 80,  40, image_width, image_height, (uint16_t*)rgb565);  // good. バイト順変換が有効ならRGB565のデータは色化けしない。
-  lcd.pushImage( 80,  80, image_width, image_height, (void*    )rgb888);  // good. バイト順変換が有効ならRGB888のデータは色化けしない。
-  lcd.pushImage( 80, 120, image_width, image_height, (uint16_t*)swap565); // NG. バイト順変換済みデータにバイト順変換を行うと色化けする。
-  lcd.pushImage( 80, 160, image_width, image_height, (void*    )bgr888);  // NG. バイト順変換済みデータにバイト順変換を行うと色化けする。
-
-// データの型として、lgfx::名前空間に定義されている型を利用する事もできます。
-// これらの型にキャストする場合はsetSwapBytesの設定は無視されます。
-  lcd.pushImage(120,   0, image_width, image_height, (lgfx:: rgb332_t*) rgb332); // good  8bitデータ
-  lcd.pushImage(120,  40, image_width, image_height, (lgfx:: rgb565_t*) rgb565); // good 16bitデータ
-  lcd.pushImage(120,  80, image_width, image_height, (lgfx:: rgb888_t*) rgb888); // good 24bitデータ
-  lcd.pushImage(120, 120, image_width, image_height, (lgfx::swap565_t*)swap565); // good バイト順変換済み16bitデータ
-  lcd.pushImage(120, 160, image_width, image_height, (lgfx:: bgr888_t*) bgr888); // good バイト順変換済み24bitデータ
-
-// 第６引数で透過色を指定できます。透過指定された色のある部分は描画されません。
-  lcd.pushImage(160,   0, image_width, image_height, (lgfx:: rgb332_t*) rgb332, 0);                   // 黒を透過指定
-  lcd.pushImage(160,  40, image_width, image_height, (lgfx:: rgb565_t*) rgb565, (uint8_t)0xE0);       // 赤を透過指定
-  lcd.pushImage(160,  80, image_width, image_height, (lgfx:: rgb888_t*) rgb888, (uint16_t)0x07E0);    // 緑を透過指定
-  lcd.pushImage(160, 120, image_width, image_height, (lgfx::swap565_t*)swap565, (uint32_t)0x0000FFU); // 青を透過指定
-  lcd.pushImage(160, 160, image_width, image_height, (lgfx:: bgr888_t*) bgr888, TFT_WHITE);           // 白を透過指定
-
-  lcd.display();
-  delay(4000);
-  lcd.clear(TFT_DARKGREY);
-
-// pushImageRotateZoom関数を使うと、画像を回転拡大縮小させて描画できます。
-  for (int angle = 0; angle <= 360; ++angle) {
-    lcd.pushImageRotateZoom
-      ( lcd.width()  >> 2  // 描画先の中心座標X
-      , lcd.height() >> 1  // 描画先の中心座標Y
-      , image_width  >> 1  // 画像の中心座標X
-      , image_height >> 1  // 画像の中心座標Y
-      , angle              // 回転角度
-      , 3.0                // X方向の描画倍率 (マイナス指定で反転可能)
-      , 3.0                // Y方向の描画倍率 (マイナス指定で反転可能)
-      , image_width        // 画像データの幅
-      , image_height       // 画像データの高さ
-      , rgb332             // 画像データのポインタ
-      );
-
-// pushImageRotateZoomWithAA関数を使うと、アンチエイリアスが有効になります。
-    lcd.pushImageRotateZoomWithAA
-      ( lcd.width()*3>> 2
-      , lcd.height() >> 1
-      , image_width  >> 1
-      , image_height >> 1
-      , angle
-      , 3.0
-      , 3.0
-      , image_width
-      , image_height
-      , rgb332
-      );
-
-    if ((angle % 36) == 0) { lcd.display(); }
-  }
-
-  lcd.clear(TFT_DARKGREY);
-
-// pushImageAffine関数を使うと、画像をアフィン変換で変形させて描画できます。
-// アフィン変換のパラメータはfloat型の配列で指定します。
-  {
-    float matrix[6] = // 等倍表示
-      { 1.0,  0.0,  (float)lcd.width()  / 2
-      , 0.0,  1.0,  (float)lcd.height() / 2 };
-    lcd.pushImageAffine(matrix, image_width, image_height, rgb332);
-  }
-
-  lcd.display();
-  delay(1000);
-  lcd.clear(TFT_DARKGREY);
-
-  {
-    float matrix[6] = // 横２倍表示
-      { 2.0,  0.0,  (float)lcd.width()  / 2
-      , 0.0,  1.0,  (float)lcd.height() / 2 };
-    lcd.pushImageAffine(matrix, image_width, image_height, rgb332);
-  }
-
-  lcd.display();
-  delay(1000);
-  lcd.clear(TFT_DARKGREY);
-
-  {
-    float matrix[6] = // 縦２倍表示
-      { 1.0,  0.0,  (float)lcd.width()  / 2
-      , 0.0,  2.0,  (float)lcd.height() / 2 };
-    lcd.pushImageAffine(matrix, image_width, image_height, rgb332);
-  }
-
-  lcd.display();
-  delay(1000);
-  lcd.clear(TFT_DARKGREY);
-
-  {
-    float matrix[6] = // 斜め変形
-      { 1.0, -0.4,  (float)lcd.width()  / 2
-      , 0.0,  1.0,  (float)lcd.height() / 2 };
-    lcd.pushImageAffine(matrix, image_width, image_height, rgb332);
-  }
-
-  lcd.display();
-  delay(1000);
-  lcd.clear(TFT_DARKGREY);
-
-  // pushImageAffineWithAA関数を使用するとアンチエイリアスが有効になります。
-  {
-    float matrix[6] =
-      { 1.0,  0.0,  (float)lcd.width()  / 2
-      , 0.0,  1.0,  (float)lcd.height() / 2 };
-    for (int i = -300; i < 300; i++) {
-      float f = (float)i / 100;
-      matrix[1] = f;
-      matrix[3] = f;
-      lcd.pushImageAffineWithAA(matrix, image_width, image_height, rgb332);
-
-      if ((i % 30) == 0) { lcd.display(); }
     }
   }
-
-
+  
 }
-
-/*
-//----------------------------------------------------------------------------
-#define R 0x00,0x00,0xFF,
-#define G 0x00,0xFF,0x00,
-#define B 0xFF,0x00,0x00,
-#define C 0xFF,0xFF,0x00,
-#define M 0xFF,0x00,0xFF,
-#define Y 0x00,0xFF,0xFF,
-#define W 0xFF,0xFF,0xFF,
-#define _ 0x00,0x00,0x00,
-constexpr uint8_t rgb888[] = {
-#include "image.h"
-};
-#undef R
-#undef G
-#undef B
-#undef C
-#undef M
-#undef Y
-#undef W
-#undef _
-//----------------------------------------------------------------------------
-#define R 0xFF,0x00,0x00,
-#define G 0x00,0xFF,0x00,
-#define B 0x00,0x00,0xFF,
-#define C 0x00,0xFF,0xFF,
-#define M 0xFF,0x00,0xFF,
-#define Y 0xFF,0xFF,0x00,
-#define W 0xFF,0xFF,0xFF,
-#define _ 0x00,0x00,0x00,
-constexpr uint8_t bgr888[] = {
-#include "image.h"
-};
-#undef R
-#undef G
-#undef B
-#undef C
-#undef M
-#undef Y
-#undef W
-#undef _
-//----------------------------------------------------------------------------
-#define R 0x00F8,
-#define G 0xE007,
-#define B 0x1F00,
-#define C 0xFF07,
-#define M 0x1FF8,
-#define Y 0xE0FF,
-#define W 0xFFFF,
-#define _ 0x0000,
-constexpr uint16_t swap565[] = {
-#include "image.h"
-};
-#undef R
-#undef G
-#undef B
-#undef C
-#undef M
-#undef Y
-#undef W
-#undef _
-//----------------------------------------------------------------------------
-#define R 0xF800,
-#define G 0x07E0,
-#define B 0x001F,
-#define C 0x07FF,
-#define M 0xF81F,
-#define Y 0xFFE0,
-#define W 0xFFFF,
-#define _ 0x0000,
-constexpr uint16_t rgb565[] = {
-#include "image.h"
-};
-#undef R
-#undef G
-#undef B
-#undef C
-#undef M
-#undef Y
-#undef W
-#undef _
-//----------------------------------------------------------------------------
-#define R 0xE0,
-#define G 0x1C,
-#define B 0x03,
-#define C 0x1F,
-#define M 0xE3,
-#define Y 0xFC,
-#define W 0xFF,
-#define _ 0x00,
-constexpr uint8_t rgb332[] = {
-#include "image.h"
-};
-#undef R
-#undef G
-#undef B
-#undef C
-#undef M
-#undef Y
-#undef W
-#undef _
-*/
+  
