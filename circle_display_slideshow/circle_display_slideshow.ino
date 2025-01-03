@@ -4,7 +4,7 @@
 
 SDClass SD;  /**< SDClass object */ 
 
-File myFile; /**< File object */ 
+File myFile,dir; /**< File object */ 
 
 #include "LGFX_SPRESENSE_sample.hpp"
 
@@ -66,8 +66,8 @@ void setup(void)
   // }
 
   // /* Re-open the file for reading */
-  // myFile = SD.open("dir/test.txt");
-
+  myFile = SD.open("spresense_logo.png");
+  dir = SD.open("");
   // if (myFile) {
   //   Serial.println("test.txt:");
 
@@ -214,22 +214,42 @@ setAddrWindow は描画範囲外が指定された場合は範囲内に調整さ
   // 描画先の座標と画像の幅・高さを指定して画像データを描画します。
 //  lcd.pushImage(   0, 0, image_width, image_height, (uint16_t*)rgb565); // RGB565の16bit画像データを描画。
   // lcd.pushImage(   0, 0, 240, 240, (uint16_t*)sunrise); // RGB565の16bit画像データを描画。
-  lcd.drawPngFile(SD, "spresense_logo.png", 0, 0);
+  // lcd.drawPngFile(SD, "spresense_logo.png", 0, 0);
+  // String fileName = String(myFile.name());
+  String fileName = myFile.name();
+  fileName.replace("/mnt/sd0", "");
+  lcd.drawPngFile(SD, fileName.c_str(), 0, 0);
+  
+  // lcd.drawPngFile(SD, myFile.name(), 0, 0);
+  // lcd.drawPngFile(SD, String(myFile.name()).c_str(), 0, 0);
+
   delay(1000);
 // 入力端子の実装がなければ以下のループを実施
   while(true){
-    lcd.drawPngFile(SD, "snake_240x240.png", 0, 0);
-    delay(1000);
-    lcd.drawPngFile(SD, "kansya_240.png", 0, 0);
-    delay(1000);
-    lcd.drawPngFile(SD, "2025.png", 0, 0);
-    delay(1000);
-    lcd.drawPngFile(SD, "spresense_logo.png", 0, 0);
-    delay(1000);
-    if(digitalRead(2)== 0){ // Spresenseのロゴの表示後にpin2が押されていたらループを抜ける
-      break;
-    delay(1000);
-    }
+      myFile = dir.openNextFile();
+      if (!myFile) dir.rewindDirectory();
+
+      String fileName = myFile.name();
+      Serial.println("Attempting to open file: " + String(myFile.name()));      
+      if (myFile.isDirectory()) {
+      }else{
+        if (strstr(myFile.name(), ".png")) {
+          fileName.replace("/mnt/sd0", "");
+          lcd.drawPngFile(SD, fileName.c_str(), 0, 0);
+          delay(1000);
+          if(digitalRead(2)== 0){ // Spresenseのロゴの表示後にpin2が押されていたらループを抜ける
+          break;
+          delay(1000);
+          }
+        }
+    // lcd.drawPngFile(SD, "snake_240x240.png", 0, 0);
+    // lcd.drawPngFile(SD, "kansya_240.png", 0, 0);
+    // delay(1000);
+    // lcd.drawPngFile(SD, "2025.png", 0, 0);
+    // delay(1000);
+    // lcd.drawPngFile(SD, "spresense_logo.png", 0, 0);
+    // delay(1000);
+      }
   }
 
   while(true){
